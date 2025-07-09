@@ -14,9 +14,10 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch full history to ensure we have access to previous commits
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -33,11 +34,18 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             
+            # Debug: Show current commit info
+            echo "Current commit: $(git rev-parse HEAD)"
+            echo "Previous commit: $(git rev-parse HEAD^)"
+            
             # Find CSV files that were changed in the last commit
-            CSV_FILES=$(git diff --name-only HEAD~1 HEAD | grep '\.csv$' || true)
+            CSV_FILES=$(git diff --name-only HEAD^ HEAD | grep '\.csv$' || true)
             
             if [ -z "$CSV_FILES" ]; then
               echo "No CSV files found in last commit"
+              # Show all files that changed for debugging
+              echo "Files changed in last commit:"
+              git diff --name-only HEAD^ HEAD
               exit 1
             fi
             
@@ -47,7 +55,7 @@ jobs:
             # Revert only the CSV files to their previous state
             for file in $CSV_FILES; do
               echo "Reverting $file"
-              git checkout HEAD~1 -- "$file"
+              git checkout HEAD^ -- "$file"
             done
             
             # Commit the reverted CSV files
