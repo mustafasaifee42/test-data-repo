@@ -34,7 +34,7 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             
             # Find CSV files that were changed in the last commit
-            CSV_FILES=$(git diff --name-only HEAD~1 HEAD | grep '\.csv || true)
+            CSV_FILES=$(git diff --name-only HEAD~1 HEAD | grep '\.csv$' || true)
             
             if [ -z "$CSV_FILES" ]; then
               echo "No CSV files found in last commit"
