@@ -29,10 +29,16 @@ jobs:
       - name: Run validation and revert on failure
         run: |
           if ! node validate.js; then
-            echo "Validation failed. Reverting commit..."
+            echo "Validation failed. Reverting last commit..."
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git revert --no-edit HEAD
+            
+            # Get the commit hash of the last commit
+            LAST_COMMIT=$(git rev-parse HEAD)
+            echo "Reverting commit: $LAST_COMMIT"
+            
+            # Revert only the last commit
+            git revert --no-edit $LAST_COMMIT
             git push origin HEAD
             exit 1  # Fail the workflow
           fi
