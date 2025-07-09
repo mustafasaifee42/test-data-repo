@@ -26,14 +26,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run validation
-        run: node validate.js
-        continue-on-error: true  # Allow next step to run even if it fails
-
-      - name: Revert commit if validation failed
-        if: steps.validate.outcome == 'failure'
+      - name: Run validation and revert on failure
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git revert --no-edit HEAD
-          git push origin HEAD
+          if ! node validate.js; then
+            echo "Validation failed. Reverting commit..."
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git revert --no-edit HEAD
+            git push origin HEAD
+            exit 1  # Fail the workflow
+          fi
