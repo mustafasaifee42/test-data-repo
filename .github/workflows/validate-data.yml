@@ -39,6 +39,7 @@ jobs:
         run: |
           cd validation
           if ! node validate.js; then
+            cd..
             echo "Validation failed. Reverting only data file changes..."
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -48,7 +49,6 @@ jobs:
             echo "Previous commit: $(git rev-parse HEAD^)"
             
             # Find data files that were changed in the last commit
-            # Use extended regex (-E) to support alternation with |
             DATA_FILES=$(git diff --name-only HEAD^ HEAD | grep -E '^data/.*\.(csv|json|xlsx|xls)$' || true)
             
             if [ -z "$DATA_FILES" ]; then
@@ -64,44 +64,13 @@ jobs:
             
             # Revert only the data files to their previous state
             for file in $DATA_FILES; do
-              echo "Processing $file"
-              
-              # Debug: Check if file exists in current commit
-              if [ -f "$file" ]; then
-                echo "✓ File exists in working directory: $file"
-                file_status="modified"
-              else
-                echo "✗ File does not exist in working directory: $file"
-                file_status="deleted"
-              fi
-              
-              # Debug: Check if file exists in previous commit
-              if git cat-file -e HEAD^:"$file" 2>/dev/null; then
-                echo "✓ File exists in previous commit: $file"
-                
-                if [ "$file_status" = "deleted" ]; then
-                  echo "File was deleted - restoring from previous commit"
-                  # For deleted files, we need to restore them differently
-                  git show HEAD^:"$file" > "$file"
-                  git add "$file"
-                else
-                  echo "File was modified - reverting to previous version"
-                  git checkout HEAD^ -- "$file"
-                fi
-              else
-                echo "✗ File does not exist in previous commit: $file"
-                echo "File is newly added - removing it"
-                git rm "$file" 2>/dev/null || rm -f "$file"
-              fi
+              echo "Reverting $file"
+              git checkout HEAD^ -- "$file"
             done
             
-            # Commit the reverted/removed data files
-            if git diff --staged --quiet; then
-              echo "No changes to commit after reversion"
-            else
-              git add data/*.csv data/*.json data/*.xlsx data/*.xls logs/* 2>/dev/null || true
-              git commit -m "Revert data files due to validation failure"
-              git push origin HEAD
-            fi
+            # Commit the reverted data files
+            git add data/*.csv data/*.json data/*.xlsx data/*.xls logs/* 2>/dev/null || true
+            git commit -m "Revert data files due to validation failure"
+            git push origin HEAD
             exit 1  # Fail the workflow
           fi
