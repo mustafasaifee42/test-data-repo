@@ -48,7 +48,7 @@ jobs:
             echo "Previous commit: $(git rev-parse HEAD^)"
             
             # Find CSV files that were changed in the last commit
-            DATA_FILES=$(git diff --name-only HEAD^ HEAD | grep '^data/.*\.(csv|json|xlsx|xls)$' || true)
+            DATA_FILES=$(git diff --name-only HEAD^ HEAD | grep -E '^data/.*\.(csv|json|xlsx|xls)$' || true)
             
             if [ -z "$DATA_FILES" ]; then
               echo "No data files (CSV, JSON, XLSX, XLS) found in data folder in last commit"
@@ -61,13 +61,13 @@ jobs:
             echo "Reverting these data files:"
             echo "$DATA_FILES"
             
-            # Revert only the CSV files to their previous state
+            # Revert only the data files to their previous state
             for file in $DATA_FILES; do
               echo "Reverting $file"
               git checkout HEAD^ -- "$file"
             done
             
-            # Commit the reverted CSV files
+            # Commit the reverted data files
             git add data/*.csv data/*.json data/*.xlsx data/*.xls logs/* 2>/dev/null || true
             git commit -m "Revert data files due to validation failure"
             git push origin HEAD
