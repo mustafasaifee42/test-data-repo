@@ -10,7 +10,7 @@ function log(message) {
 }
 
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
-const content = fs.readFileSync('data.csv', 'utf8');
+const content = fs.readFileSync('../data/data.csv', 'utf8');
 console.log(content)
 
 log('❌ Validation failed: Missing required field');
