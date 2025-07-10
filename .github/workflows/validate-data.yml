@@ -39,7 +39,7 @@ jobs:
         run: |
           cd validation
           if ! node validate.js; then
-            cd..
+            cd ..
             echo "Validation failed. Reverting only data file changes..."
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
