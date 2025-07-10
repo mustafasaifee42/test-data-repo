@@ -68,7 +68,7 @@ jobs:
             done
             
             # Commit the reverted CSV files
-            git add data/*.csv data/*.json data/*.xlsx data/*.xls 2>/dev/null || true
+            git add data/*.csv data/*.json data/*.xlsx data/*.xls logs/* 2>/dev/null || true
             git commit -m "Revert data files due to validation failure"
             git push origin HEAD
             exit 1  # Fail the workflow
