@@ -3,10 +3,16 @@ name: Validate Data Sheet
 on:
   push:
     paths:
-      - '**.csv'
+      - 'data/*.csv'
+      - 'data/*.json'
+      - 'data/*.xlsx'
+      - 'data/*.xls'
   pull_request:
     paths:
-      - '**.csv'
+      - 'data/*.csv'
+      - 'data/*.json'
+      - 'data/*.xlsx'
+      - 'data/*.xls'
 
 permissions:
   contents: write
@@ -25,10 +31,13 @@ jobs:
           node-version: '22.0.0'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          cd validation
+          npm install
 
       - name: Run validation and revert on failure
         run: |
+          cd validation
           if ! node validate.js; then
             echo "Validation failed. Reverting only CSV changes..."
             git config user.name "github-actions[bot]"
@@ -39,28 +48,28 @@ jobs:
             echo "Previous commit: $(git rev-parse HEAD^)"
             
             # Find CSV files that were changed in the last commit
-            CSV_FILES=$(git diff --name-only HEAD^ HEAD | grep '\.csv$' || true)
+            DATA_FILES=$(git diff --name-only HEAD^ HEAD | grep '^data/.*\.(csv|json|xlsx|xls)$' || true)
             
-            if [ -z "$CSV_FILES" ]; then
-              echo "No CSV files found in last commit"
+            if [ -z "$DATA_FILES" ]; then
+              echo "No data files (CSV, JSON, XLSX, XLS) found in data folder in last commit"
               # Show all files that changed for debugging
               echo "Files changed in last commit:"
               git diff --name-only HEAD^ HEAD
               exit 1
             fi
             
-            echo "Reverting these CSV files:"
-            echo "$CSV_FILES"
+            echo "Reverting these data files:"
+            echo "$DATA_FILES"
             
             # Revert only the CSV files to their previous state
-            for file in $CSV_FILES; do
+            for file in $DATA_FILES; do
               echo "Reverting $file"
               git checkout HEAD^ -- "$file"
             done
             
             # Commit the reverted CSV files
-            git add *.csv
-            git commit -m "Revert CSV files due to validation failure"
+            git add data/*.csv data/*.json data/*.xlsx data/*.xls 2>/dev/null || true
+            git commit -m "Revert data files due to validation failure"
             git push origin HEAD
             exit 1  # Fail the workflow
           fi
