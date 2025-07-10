@@ -48,6 +48,7 @@ jobs:
             echo "Previous commit: $(git rev-parse HEAD^)"
             
             # Find data files that were changed in the last commit
+            # Use extended regex (-E) to support alternation with |
             DATA_FILES=$(git diff --name-only HEAD^ HEAD | grep -E '^data/.*\.(csv|json|xlsx|xls)$' || true)
             
             if [ -z "$DATA_FILES" ]; then
@@ -68,24 +69,28 @@ jobs:
               # Debug: Check if file exists in current commit
               if [ -f "$file" ]; then
                 echo "✓ File exists in working directory: $file"
+                file_status="modified"
               else
                 echo "✗ File does not exist in working directory: $file"
+                file_status="deleted"
               fi
               
               # Debug: Check if file exists in previous commit
               if git cat-file -e HEAD^:"$file" 2>/dev/null; then
                 echo "✓ File exists in previous commit: $file"
-                echo "Reverting $file to previous version"
-                git checkout HEAD^ -- "$file"
+                
+                if [ "$file_status" = "deleted" ]; then
+                  echo "File was deleted - restoring from previous commit"
+                  # For deleted files, we need to restore them differently
+                  git show HEAD^:"$file" > "$file"
+                  git add "$file"
+                else
+                  echo "File was modified - reverting to previous version"
+                  git checkout HEAD^ -- "$file"
+                fi
               else
                 echo "✗ File does not exist in previous commit: $file"
-                echo "Checking if it's a path issue..."
-                # List all files in the data directory in previous commit
-                echo "Files in data/ directory in previous commit:"
-                git ls-tree HEAD^ -- data/ || echo "No data directory in previous commit"
-                
-                # Remove the file since it's new or has path issues
-                echo "Removing $file"
+                echo "File is newly added - removing it"
                 git rm "$file" 2>/dev/null || rm -f "$file"
               fi
             done
