@@ -39,7 +39,7 @@ jobs:
         run: |
           cd validation
           if ! node validate.js; then
-            echo "Validation failed. Reverting only CSV changes..."
+            echo "Validation failed. Reverting only data file changes..."
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             
@@ -47,7 +47,7 @@ jobs:
             echo "Current commit: $(git rev-parse HEAD)"
             echo "Previous commit: $(git rev-parse HEAD^)"
             
-            # Find CSV files that were changed in the last commit
+            # Find data files that were changed in the last commit
             DATA_FILES=$(git diff --name-only HEAD^ HEAD | grep -E '^data/.*\.(csv|json|xlsx|xls)$' || true)
             
             if [ -z "$DATA_FILES" ]; then
@@ -63,13 +63,40 @@ jobs:
             
             # Revert only the data files to their previous state
             for file in $DATA_FILES; do
-              echo "Reverting $file"
-              git checkout HEAD^ -- "$file"
+              echo "Processing $file"
+              
+              # Debug: Check if file exists in current commit
+              if [ -f "$file" ]; then
+                echo "✓ File exists in working directory: $file"
+              else
+                echo "✗ File does not exist in working directory: $file"
+              fi
+              
+              # Debug: Check if file exists in previous commit
+              if git cat-file -e HEAD^:"$file" 2>/dev/null; then
+                echo "✓ File exists in previous commit: $file"
+                echo "Reverting $file to previous version"
+                git checkout HEAD^ -- "$file"
+              else
+                echo "✗ File does not exist in previous commit: $file"
+                echo "Checking if it's a path issue..."
+                # List all files in the data directory in previous commit
+                echo "Files in data/ directory in previous commit:"
+                git ls-tree HEAD^ -- data/ || echo "No data directory in previous commit"
+                
+                # Remove the file since it's new or has path issues
+                echo "Removing $file"
+                git rm "$file" 2>/dev/null || rm -f "$file"
+              fi
             done
             
-            # Commit the reverted data files
-            git add data/*.csv data/*.json data/*.xlsx data/*.xls logs/* 2>/dev/null || true
-            git commit -m "Revert data files due to validation failure"
-            git push origin HEAD
+            # Commit the reverted/removed data files
+            if git diff --staged --quiet; then
+              echo "No changes to commit after reversion"
+            else
+              git add data/*.csv data/*.json data/*.xlsx data/*.xls logs/* 2>/dev/null || true
+              git commit -m "Revert data files due to validation failure"
+              git push origin HEAD
+            fi
             exit 1  # Fail the workflow
           fi
