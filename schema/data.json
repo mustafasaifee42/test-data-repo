@@ -6,16 +6,21 @@
     },
     {
         "columnName": "column 2",
-        "type": "dateTime",
+        "type": "number",
         "required": true
     },
     {
         "columnName": "column 3",
+        "type": "dateTime",
+        "required": true
+    },
+    {
+        "columnName": "column 4",
         "type": "number",
         "required": false
     },
     {
-        "columnName": "column 4",
+        "columnName": "column 5",
         "type": "Alpha 3 code",
         "required": true
     }

@@ -40,8 +40,10 @@ files.filter(file => {
       const validationErrors = validateData(parseCsvString(content), schema);
       if(validationErrors.length !== 0) {
         console.log('');
-        console.log(`❌ ${file} filed validation. Following are the errors:`);
-        console.log(JSON.stringify(validationErrors, 2));
+        console.log(`❌ ${file} failed validation. Total ${validationErrors.length} errors:`);
+        validationErrors.forEach((el,i) => {
+          console.log(`Error ${i + 1}: ${JSON.stringify(el, 2)}`)
+        });
         console.log('');
         invalidFiles.push(file);
       } else {
