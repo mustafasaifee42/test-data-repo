@@ -12,7 +12,8 @@
     {
         "columnName": "column 3",
         "type": "dateTime",
-        "required": true
+        "required": true,
+        "dateFormat": "MM-yyyy"
     },
     {
         "columnName": "column 4",
