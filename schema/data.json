@@ -17,7 +17,7 @@
     {
         "columnName": "column 4",
         "type": "number",
-        "required": false
+        "required": true
     },
     {
         "columnName": "column 5",
