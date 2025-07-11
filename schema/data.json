@@ -1,0 +1,22 @@
+[
+    {
+        "columnName": "column 1",
+        "type": "string",
+        "required": true
+    },
+    {
+        "columnName": "column 2",
+        "type": "dateTime",
+        "required": true
+    },
+    {
+        "columnName": "column 3",
+        "type": "number",
+        "required": false
+    },
+    {
+        "columnName": "column 4",
+        "type": "Alpha 3 code",
+        "required": true
+    }
+]
