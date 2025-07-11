@@ -6,7 +6,7 @@
     },
     {
         "columnName": "column 2",
-        "type": "number",
+        "type": "string",
         "required": true
     },
     {
