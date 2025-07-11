@@ -40,22 +40,27 @@ jobs:
           cd validation
           if ! node validate.js; then
             cd ..
-            echo "Validation failed. Reverting only data file changes..."
+            echo "❌ Validation failed. Reverting modified data files..."
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             
             # Debug: Show current commit info
+            echo
             echo "Current commit: $(git rev-parse HEAD)"
             echo "Previous commit: $(git rev-parse HEAD^)"
+            echo
             
             # Find data files that were changed in the last commit
             DATA_FILES=$(git diff --name-only HEAD^ HEAD | grep -E '^data/.*\.(csv|json|xlsx|xls)$' || true)
             
             if [ -z "$DATA_FILES" ]; then
+              echo
               echo "No data files (CSV, JSON, XLSX, XLS) found in data folder in last commit"
               # Show all files that changed for debugging
+              echo
               echo "Files changed in last commit:"
               git diff --name-only HEAD^ HEAD
+              echo
               exit 1
             fi
             
@@ -64,12 +69,15 @@ jobs:
             
             # Revert only the data files to their previous state
             for file in $DATA_FILES; do
+              echo
               echo "Reverting $file"
               git checkout HEAD^ -- "$file"
+              echo
             done
             
             # Commit the reverted data files
-            git add data/*.csv data/*.json data/*.xlsx data/*.xls logs/* 2>/dev/null || true
+            echo
+            git add data/*.csv data/*.json data/*.xlsx data/*.xls 2>/dev/null || true
             git commit -m "Revert data files due to validation failure"
             git push origin HEAD
             exit 1  # Fail the workflow
