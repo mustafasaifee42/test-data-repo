@@ -23,7 +23,7 @@ jobs:
   validate-data:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Fetch full history to ensure we have access to previous commits
 
@@ -84,9 +84,22 @@ jobs:
             git push origin HEAD
             exit 1  # Fail the workflow
           else
-            echo
-            git add validation.log 2>/dev/null || true
-            git commit -m "Add validation logs"
-            git push origin HEAD
+            echo "✅ Validation passed!"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            
+            # Only commit if validation.log exists and has changes
+            if [ -f validation.log ]; then
+              git add validation.log
+              if ! git diff --cached --quiet; then
+                git commit -m "Add validation logs"
+                git push origin HEAD
+                echo "📝 Validation logs committed"
+              else
+                echo "📝 No changes to commit"
+              fi
+            else
+              echo "📝 No validation log to commit"
+            fi
             exit 0  # Successful workflow
           fi
