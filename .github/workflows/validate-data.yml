@@ -78,7 +78,7 @@ jobs:
             # Commit the reverted data files
             echo
             git add data/*.csv data/*.json data/*.xlsx data/*.xls validation.log 2>/dev/null || true
-            git commit -m "Revert data files due to validation failure + Add validation logs"
+            git commit -m "Revert data files due to validation failure + Update logs"
             git push origin HEAD
             exit 1  # Fail the workflow
           else
@@ -91,7 +91,7 @@ jobs:
             if [ -f validation.log ]; then
               git add validation.log
               if ! git diff --cached --quiet; then
-                git commit -m "Add validation logs"
+                git commit -m "Update logs"
                 git push origin HEAD
                 echo "📝 Validation logs committed"
               else
