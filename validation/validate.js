@@ -45,7 +45,7 @@ files.filter(file => {
         console.log('');
         console.log(`❌ ${file} failed validation. Total ${validationErrors.length} errors:`);
         validationErrors.forEach((el,i) => {
-          console.log(`Error ${i + 1}: ${JSON.stringify(el, 2)}`)
+          console.log(`Error ${i + 1}: ${JSON.stringify(el)}`)
         });
         console.log('');
         invalidFiles.push({file, err: validationErrors});
@@ -59,13 +59,14 @@ files.filter(file => {
       console.log('');
       console.log(`🔥 Error reading file ${filePath}: ${error.message}`);
       console.log('');
-      invalidFiles.push(file);
+      invalidFiles.push({file, err: error.message});
       process.exit(1);
 
     }
   } else {
     console.log('');
     console.log(`🔥 Schema file does not exist for ${file}. No validation required.`);
+    validFiles.push(file);
     console.log('');
   }
 });
@@ -82,12 +83,12 @@ if(invalidFiles.length > 0) {
   const logContent = `Updated on: ${formattedDate}
 Status: ❌ Validation failed. Files reverted to their previous valid version.
 
-🚩 Issues
+🚩 Files with issues (${invalidFiles.length})
 ${invalidFiles.map(d => `
 
 📄 ${d.file}
 ${d.err.map(e => `
-Row: ${e.rowNo} | Column: ${e.column} | ⚠️ Error: ${e.error}`)}`)}
+Row: ${e.rowNo + 1} | Column: ${e.column} | ⚠️ Error: ${e.error}`)}`)}
 `;
   fs.writeFileSync(logPath, logContent, 'utf8');
   console.log('---');
@@ -105,7 +106,7 @@ console.log('');
 const now = new Date();
 const formattedDate = now.toISOString();
 const logContent = `Updated on: ${formattedDate}
-Status: ✅ Validation Successful
+Status: ✅ Validation Successful.
 `;
 fs.writeFileSync(logPath, logContent, 'utf8');
 console.log('---');
