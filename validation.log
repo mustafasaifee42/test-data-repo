@@ -1,2 +1,10 @@
-Updated on: 2025-07-12T08:59:31.783Z
-Status: ✅ Validation Successful
+Updated on: 2025-07-12T09:10:39.687Z
+Status: ❌ Validation failed. Files reverted to their previous valid version.
+
+🚩 Files with issues (1)
+
+
+📄 data.csv
+
+Row: NaN | Column: column 4 | ⚠️ Error: column 4 must be a valid number. Current rowValue: asds.,
+Row: NaN | Column: column 4 | ⚠️ Error: column 4 must be a valid number. Current rowValue: as.
