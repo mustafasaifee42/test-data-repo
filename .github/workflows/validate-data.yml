@@ -23,14 +23,14 @@ jobs:
   validate-data:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Fetch full history to ensure we have access to previous commits
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.0.0'
+          node-version: '22'
 
       - name: Install dependencies
         run: |
@@ -79,8 +79,14 @@ jobs:
             
             # Commit the reverted data files
             echo
-            git add data/*.csv data/*.json data/*.xlsx data/*.xls 2>/dev/null || true
-            git commit -m "Revert data files due to validation failure"
+            git add data/*.csv data/*.json data/*.xlsx data/*.xls validation.log 2>/dev/null || true
+            git commit -m "Revert data files due to validation failure + Add validation logs"
             git push origin HEAD
             exit 1  # Fail the workflow
+          else
+            echo
+            git add validation.log 2>/dev/null || true
+            git commit -m "Add validation logs"
+            git push origin HEAD
+            exit 0  # Successful workflow
           fi
