@@ -1,2 +1,16 @@
-Updated on: 7/12/2025, 9:31:57 AM UTC
-Status: ✅ Validation Successful.
+Updated on: 7/12/2025, 9:35:42 AM UTC
+Status: ❌ Validation failed. Files reverted to their previous valid version.
+
+---
+
+**🚩 Files with issues (2)**
+
+📄 data.csv
+Row: 1 | Column: column 4 | ⚠️ Error: column 4 must be a valid number. Current rowValue: as.
+
+---
+,📄 data1.csv
+Row: 1 | Column: column 4 | ⚠️ Error: column 4 must be a valid number. Current rowValue: as.
+
+---
+
