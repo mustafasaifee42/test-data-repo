@@ -12,6 +12,8 @@ const allowedExtensions = ['.csv', '.xlsx', '.json', '.xls'];
 const files = fs.readdirSync(dataDir);
 
 let invalidFiles = [];
+let validFiles = [];
+
 
 console.log('');
 console.log('---');
@@ -46,10 +48,11 @@ files.filter(file => {
           console.log(`Error ${i + 1}: ${JSON.stringify(el, 2)}`)
         });
         console.log('');
-        invalidFiles.push(file);
+        invalidFiles.push({file, err: validationErrors});
       } else {
         console.log('');
         console.log(`✅ ${file} is valid!`);
+        validFiles.push(file);
         console.log('');
       }      
     } catch (error) {
@@ -75,8 +78,17 @@ if(invalidFiles.length > 0) {
   console.log('---');
   console.log('');
   const now = new Date();
-  const formattedDate = now.toISOString().split('T')[0];
-  const logContent = `Updated on ${formattedDate}`;
+  const formattedDate = now.toISOString();
+  const logContent = `Updated on: ${formattedDate}
+Status: ❌ Validation failed. Files reverted to their previous valid version.
+
+🚩 Issues
+${invalidFiles.map(d => `
+
+📄 ${d.file}
+${d.err.map(e => `
+Row: ${e.rowNo} | Column: ${e.column} | ⚠️ Error: ${e.error}`)}`)}
+`;
   fs.writeFileSync(logPath, logContent, 'utf8');
   console.log('---');
   console.log('');
@@ -91,8 +103,10 @@ console.log('');
 console.log('---');
 console.log('');
 const now = new Date();
-const formattedDate = now.toISOString().split('T')[0];
-const logContent = `Updated on ${formattedDate}`;
+const formattedDate = now.toISOString();
+const logContent = `Updated on: ${formattedDate}
+Status: ✅ Validation Successful
+`;
 fs.writeFileSync(logPath, logContent, 'utf8');
 console.log('---');
 console.log('');

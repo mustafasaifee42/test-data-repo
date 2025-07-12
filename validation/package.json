@@ -6,6 +6,6 @@
     "validate": "node validate.js"
   },
   "dependencies": {
-    "@undp-data/data-utils": "^0.0.3"
+    "@undp-data/data-utils": "^0.0.5"
   }
 }
