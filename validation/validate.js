@@ -84,13 +84,15 @@ Status: ❌ Validation failed. Files reverted to their previous valid version.
 
 ---
 
-**🚩 Files with issues (${invalidFiles.length})**
+🚩 Files with issues (${invalidFiles.length})
 
 ${invalidFiles.map(d => `📄 ${d.file}
 ${d.err.map(e => (`Row: ${e.index + 1} | Column: ${e.column} | ⚠️ Error: ${e.error}
-`))}
+`).join('\n'))}
+`).join('\n')}
+
 ---
-`)}
+
 `;
   fs.writeFileSync(logPath, logContent, 'utf8');
   console.log('---');
