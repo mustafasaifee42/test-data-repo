@@ -5,6 +5,7 @@ const path = require('path');
 
 const dataDir = path.resolve(__dirname, '../data');
 const schemaDir = path.resolve(__dirname, '../schema');
+const logPath = path.resolve(__dirname, '../validation.log');
 
 const allowedExtensions = ['.csv', '.xlsx', '.json', '.xls'];
 
@@ -73,6 +74,14 @@ if(invalidFiles.length > 0) {
   console.log('');
   console.log('---');
   console.log('');
+  const now = new Date();
+  const formattedDate = now.toISOString().split('T')[0];
+  const logContent = `Updated on ${formattedDate}`;
+  fs.writeFileSync(logPath, logContent, 'utf8');
+  console.log('---');
+  console.log('');
+  console.log(`✅ validation.log updated at ${formattedDate}`);
+  console.log('');
   process.exit(1);
 }
 
@@ -80,5 +89,13 @@ console.log('');
 console.log(`🎉 All files are valid`);
 console.log('');
 console.log('---');
+console.log('');
+const now = new Date();
+const formattedDate = now.toISOString().split('T')[0];
+const logContent = `Updated on ${formattedDate}`;
+fs.writeFileSync(logPath, logContent, 'utf8');
+console.log('---');
+console.log('');
+console.log(`✅ validation.log updated at ${formattedDate}`);
 console.log('');
 process.exit(0);
