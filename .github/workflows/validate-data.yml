@@ -7,14 +7,12 @@ on:
       - 'data/*.json'
       - 'data/*.xlsx'
       - 'data/*.xls'
-      - 'schema/*.json'
   pull_request:
     paths:
       - 'data/*.csv'
       - 'data/*.json'
       - 'data/*.xlsx'
       - 'data/*.xls'
-      - 'schema/*.json'
 
 permissions:
   contents: write
